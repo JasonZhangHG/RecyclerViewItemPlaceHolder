@@ -1,6 +1,9 @@
 package cool.android.placeholder;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -9,8 +12,6 @@ import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
 import android.widget.AdapterView;
 import android.widget.ImageView;
-
-import com.bumptech.glide.Glide;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -77,48 +78,62 @@ public class MainActivity extends AppCompatActivity {
     private AdapterView.OnItemClickListener mAdapterItemListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, final View view, final int position, long id) {
-            onShowImageAdapterItemClick(mShowImageAdapter.getData().get(position).getCoverUrl(), position);
+            onShowImageAdapterItemClick(mShowImageAdapter.getData().get(position).getCoverUrl(), position, view);
         }
     };
 
-    public void onShowImageAdapterItemClick(String coverUrl, final int position) {
+    public void onShowImageAdapterItemClick(String coverUrl, final int position, View view) {
         if (mAnimationImage == null) {return;}
         this.imagePosition = position;
         this.coverUrl = coverUrl;
-        mAnimationImage.setVisibility(View.VISIBLE);
-        Glide.with(MainActivity.this)
-                .load(coverUrl)
-                .fitCenter()
-                .dontAnimate()
-                .into(mAnimationImage);
-        mAnimationImage.post(new Runnable() {
-            @Override
-            public void run() {
-                ShowImageAdapter.ShowImageAdapterHolder holder = (ShowImageAdapter.ShowImageAdapterHolder) mRecyclerView.findViewHolderForAdapterPosition(position);
-                if (holder != null && holder.mItemRelativeLayout != null && holder instanceof ShowImageAdapter.ShowImageAdapterHolder) {
-                    float x = holder.mItemRelativeLayout.getX() + holder.mItemRelativeLayout.getWidth() / 2;
-                    float y = holder.mItemRelativeLayout.getY() + holder.mItemRelativeLayout.getHeight() / 2;
-                    ScaleAnimation animation = new ScaleAnimation(0.2f, 1.0f, 0.0f, 1.0f, x, y);
-                    animation.setDuration(300);
-                    animation.setAnimationListener(new Animation.AnimationListener() {
-                        @Override
-                        public void onAnimationStart(Animation animation) {
+        ActivityOptionsCompat compat = ActivityOptionsCompat.makeSceneTransitionAnimation(this, view, getString(R.string.image));
+        Intent intent = new Intent(this, ShowImageActivity.class);
+        intent.putExtra("imageURL", coverUrl);
+        ActivityCompat.startActivity(this, intent, compat.toBundle());
 
-                        }
 
-                        @Override
-                        public void onAnimationEnd(Animation animation) {
-                            mAnimationImage.setVisibility(View.VISIBLE);
-                        }
+//
+//        ActivityOptionsCompat compat = ActivityOptionsCompat.makeScaleUpAnimation(view, view.getWidth() / 2, view.getHeight() / 2, 0, 0);
+//
+//        Intent intent = new Intent(this, ShowImageActivity.class);
+//        intent.putExtra("imageURL", coverUrl);
+//        ActivityCompat.startActivity(this, intent, compat.toBundle());
 
-                        @Override
-                        public void onAnimationRepeat(Animation animation) {
-
-                        }
-                    });
-                    mAnimationImage.startAnimation(animation);
-                }
-            }
-        });
+//
+//        mAnimationImage.setVisibility(View.VISIBLE);
+//        Glide.with(MainActivity.this)
+//                .load(coverUrl)
+//                .fitCenter()
+//                .dontAnimate()
+//                .into(mAnimationImage);
+//        mAnimationImage.post(new Runnable() {
+//            @Override
+//            public void run() {
+//                ShowImageAdapter.ShowImageAdapterHolder holder = (ShowImageAdapter.ShowImageAdapterHolder) mRecyclerView.findViewHolderForAdapterPosition(position);
+//                if (holder != null && holder.mItemRelativeLayout != null && holder instanceof ShowImageAdapter.ShowImageAdapterHolder) {
+//                    float x = holder.mItemRelativeLayout.getX() + holder.mItemRelativeLayout.getWidth() / 2;
+//                    float y = holder.mItemRelativeLayout.getY() + holder.mItemRelativeLayout.getHeight() / 2;
+//                    ScaleAnimation animation = new ScaleAnimation(0.2f, 1.0f, 0.0f, 1.0f, x, y);
+//                    animation.setDuration(300);
+//                    animation.setAnimationListener(new Animation.AnimationListener() {
+//                        @Override
+//                        public void onAnimationStart(Animation animation) {
+//
+//                        }
+//
+//                        @Override
+//                        public void onAnimationEnd(Animation animation) {
+//                            mAnimationImage.setVisibility(View.VISIBLE);
+//                        }
+//
+//                        @Override
+//                        public void onAnimationRepeat(Animation animation) {
+//
+//                        }
+//                    });
+//                    mAnimationImage.startAnimation(animation);
+//                }
+//            }
+//        });
     }
 }
